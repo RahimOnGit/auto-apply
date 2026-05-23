@@ -1,0 +1,162 @@
+{
+    "https://arbetsformedlingen.se/platsbanken/annonser/31019070": {
+        "status": "skipped",
+        "reason": "BankID or login required"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31017064": {
+        "status": "applied",
+        "reason": ""
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30684859": {
+        "status": "applied",
+        "reason": ""
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31009720": {
+        "status": "applied",
+        "reason": ""
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31008123": {
+        "status": "skipped",
+        "reason": "BankID or login required"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30306504": {
+        "status": "applied",
+        "reason": ""
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31020725": {
+        "status": "skipped",
+        "reason": "BankID or login required"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31007642": {
+        "status": "applied",
+        "reason": ""
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30929045": {
+        "status": "failed",
+        "reason": "Page.goto: Timeout 45000ms exceeded.\nCall log:\n  - navigating to \"https://arbetsformedlingen.se/platsbanken/annonser/30929045\", waiting until \"load\"\n"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30900739": {
+        "status": "applied",
+        "reason": ""
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30842077": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic parameters.",
+        "timestamp": "2026-05-23 15:08:56"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30830880": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 3 elements:\n    1) <main class=\"\" tabindex=\"-1\" id=\"main-content\">…</main> aka locator(\"#main-content\")\n    2) <form id=\"chat-input\" class=\"group flex flex-col gap-2 p-3 rounded-3.5xl bg-muted w-full border text-base shadow-xl ring-1 transition-all duration-150 ease-in-out border-white ring-black/8 hover:border-white/90 hover:ring-black/12 focus-within:border-white focus-within:hover:border-white focus-within:ring-black/16 focus-within:hover:ring-black/16 dark:border-white/8 dark:ring-black/88 dark:hover:border-foreground/12 dark:hover:ring-black/96 dark:focus-within:border-foreground/16 dark:focus-within:ho…>…</form> aka locator(\"#main-content\").get_by_text(\"Ask Lovable to create a prototype...BuildSend message\")\n    3) <form id=\"chat-input\" class=\"group flex flex-col gap-2 p-3 rounded-3.5xl bg-muted w-full border text-base shadow-xl ring-1 transition-all duration-150 ease-in-out border-white ring-black/8 hover:border-white/90 hover:ring-black/12 focus-within:border-white focus-within:hover:border-white focus-within:ring-black/16 focus-within:hover:ring-black/16 dark:border-white/8 dark:ring-black/88 dark:hover:border-foreground/12 dark:hover:ring-black/96 dark:focus-within:border-foreground/16 dark:focus-within:ho…>…</form> aka get_by_text(\"Ask Lovable to create a prototype...BuildSend message\").nth(1)\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-23 15:09:31"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30721924": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic parameters.",
+        "timestamp": "2026-05-23 15:09:40"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30715630": {
+        "status": "applied",
+        "reason": "Handled via automated email draft generation.",
+        "timestamp": "2026-05-23 15:09:46"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31046698": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <main class=\"relative px-4 pt-20 pb-20 bg-company-secondary-fallback text-company-secondary\">…</main> aka get_by_role(\"main\")\n    2) <form method=\"post\" data-remote=\"true\" accept-charset=\"UTF-8\" novalidate=\"novalidate\" id=\"job-application-form\" class=\"mx-auto max-w-650\" data-turbo-frame=\"application_form\" action=\"https://jobs.avaron.se/applications\" data-careersite--form-form-class=\"pointer-events-none\" data-controller=\"careersite--form careersite--messenger-token\" data-careersite--messenger-token-candidate-endpoint-value=\"/candidates\" data-careersite--form-qualifying-questions-message-wrapper-class=\"hidden\" data-action=\"question…>…</form> aka locator(\"#job-application-form\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-23 15:09:52"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31066641": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <main class=\"relative px-4 pt-20 pb-20 bg-company-secondary-fallback text-company-secondary\">…</main> aka get_by_role(\"main\")\n    2) <form method=\"post\" data-remote=\"true\" accept-charset=\"UTF-8\" novalidate=\"novalidate\" id=\"job-application-form\" class=\"mx-auto max-w-650\" data-turbo-frame=\"application_form\" data-careersite--form-form-class=\"pointer-events-none\" action=\"https://career.psfinancegroup.com/applications\" data-controller=\"careersite--form careersite--messenger-token\" data-careersite--messenger-token-candidate-endpoint-value=\"/candidates\" data-careersite--form-qualifying-questions-message-wrapper-class=\"hidden\" data-actio…>…</form> aka locator(\"#job-application-form\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-23 15:09:57"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31067997": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic parameters.",
+        "timestamp": "2026-05-23 15:10:05"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30394863": {
+        "status": "applied",
+        "reason": "Handled via automated email draft generation.",
+        "timestamp": "2026-05-23 15:10:09"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31043537": {
+        "status": "applied",
+        "reason": "Handled via automated email draft generation.",
+        "timestamp": "2026-05-23 15:10:32"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31018812": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-23 15:18:48"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30858879": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <form method=\"GET\" class=\"search-toolbar-form\" action=\"https://www.alten.se\">…</form> aka locator(\"#header-toolbar-mobile form\")\n    2) <form method=\"GET\" class=\"search-toolbar-form\" action=\"https://www.alten.se\">…</form> aka locator(\"#header-toolbar-2 form\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-23 15:18:54"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30466704": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <main id=\"main-content\" class=\"flex flex-col flex-grow\">…</main> aka get_by_text(\"ARE YOU NEXT UP? Connect Job openings Scroll to content THIS IS SiNIX SiNIX is\")\n    2) <form method=\"post\" data-turbo=\"false\" accept-charset=\"UTF-8\" action=\"/en-GB/auto_join\" data-blocks--auto-join--form-target=\"form\" class=\"flex items-center justify-between leading-tight text-md\" data-action=\"turbo:submit-start->blocks--auto-join--form#handleBefore turbo:submit-end->blocks--auto-join--form#handleComplete\">…</form> aka get_by_text(\"@sinix.se Log in\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-23 15:18:59"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31039860": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-23 15:19:31"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30745422": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 3 elements:\n    1) <main class=\"MuiBox-root css-d3yzis\">…</main> aka get_by_role(\"main\")\n    2) <form id=\"application-form\">…</form> aka locator(\"#application-form\")\n    3) <form action=\"#\">…</form> aka locator(\"form\").filter(has_text=\"Mandatory Are you currently\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-23 15:19:38"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30546666": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-23 15:20:15"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31046623": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-23 15:22:09"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31050823": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-23 15:24:49"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31060934": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-23 15:39:33"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31066141": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <main class=\"flex flex-col flex-1\">…</main> aka get_by_text(\"Quality Systems AnalystStockholm HQOperationsPosition Summary The Quality\")\n    2) <form class=\"bg-white py-6 px-6 rounded-2xl w-full\" action=\"javascript:throw new Error('React form unexpectedly submitted.')\">…</form> aka get_by_text(\"Contact informationFirst name *Last name *Email *Phone *ApplicationCV *Click\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-23 15:39:37"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31073654": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <main class=\"relative px-4 pt-20 pb-20 bg-company-secondary-fallback text-company-secondary\">…</main> aka get_by_role(\"main\")\n    2) <form method=\"post\" data-remote=\"true\" accept-charset=\"UTF-8\" novalidate=\"novalidate\" id=\"job-application-form\" class=\"mx-auto max-w-650\" data-turbo-frame=\"application_form\" data-careersite--form-form-class=\"pointer-events-none\" action=\"https://securitas.teamtailor.com/applications\" data-controller=\"careersite--form careersite--messenger-token\" data-careersite--messenger-token-candidate-endpoint-value=\"/candidates\" data-careersite--form-qualifying-questions-message-wrapper-class=\"hidden\" data-action…>…</form> aka locator(\"#job-application-form\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-23 15:41:23"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31029871": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-23 15:41:44"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31038709": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-23 15:41:52"
+    },
+    "https://jooble.org/jdp/-1163176371669318613": {
+        "status": "failed",
+        "reason": "Navigation timeout: Target page, context or browser has been closed\n=========================== logs ===========================\n\"commit\" event fired\n\"domcontentloaded\" event fired\n\"load\" event fired\n\"commit\" event fired\n\"domcontentloaded\" event fired\n\"load\" event fired\n============================================================",
+        "timestamp": "2026-05-23 15:42:16"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31042233": {
+        "status": "failed",
+        "reason": "Locator.count: Target page, context or browser has been closed",
+        "timestamp": "2026-05-23 15:42:29"
+    }
+}

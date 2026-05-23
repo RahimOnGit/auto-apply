@@ -1,54 +1,55 @@
+# mass_apply.py
 import json
 import os
 from auto_apply import apply_to_job
+from tracker import is_processed, record_job
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'jobs_db.json') # Make sure this matches your file name
+DB_PATH = os.path.join(BASE_DIR, 'jobs_db.json')
 
 def run_mass_apply():
     try:
         with open(DB_PATH, 'r', encoding='utf-8') as f:
             jobs = json.load(f)
-    except FileNotFoundError:
-        print(f"❌ Couldn't find {DB_PATH}.")
+    except Exception as e:
+        print(f"❌ Failed to read jobs database: {e}")
         return
 
-    print(f"📦 Successfully loaded large database ({len(jobs)} total jobs found).")
-
-    # --- CHILL FILTERING & SORTING ---
-    # 1. Sort jobs so highest score comes first (or change to 'published_date' if you prefer)
+    print(f"📦 Database loaded. {len(jobs)} total jobs found.")
     jobs.sort(key=lambda x: x.get('score', 0), reverse=True)
-    
-    # 2. Slice the data so you only deal with a small batch at a time
-    BATCH_SIZE = 10 
-    jobs_batch = jobs[:BATCH_SIZE]
-    
-    print(f"🔥 Picked the top {BATCH_SIZE} highest-scoring jobs for this session.\n")
-    
-    for index, job in enumerate(jobs_batch):
+
+    BATCH_SIZE = 10
+    # Filters out any job that is already in job_history.json
+    active_batch = [j for j in jobs if not is_processed(j.get('link'))][:BATCH_SIZE]
+
+    if not active_batch:
+        print("🎉 High-five! No new unprocessed jobs remaining in this batch configuration.")
+        return
+
+    print(f"🔥 Starting batch run for the top {len(active_batch)} open jobs.\n")
+
+    for index, job in enumerate(active_batch):
         company = job.get('company', 'Unknown Company')
         title = job.get('title', 'Unknown Role')
-        score = job.get('score', 'N/A')
-        job_link = job.get('link')
-        
-        if not job_link:
-            continue
-            
-        print("==================================================")
-        print(f"🚀 Job {index + 1} of {len(jobs_batch)}: {title} @ {company} (Score: {score})")
-        print("==================================================")
-        
-        # Fire off your working automation script
-        apply_to_job(job_link)
-        
-        print("\n--------------------------------------------------")
-        user_input = input("👉 Press ENTER to load the NEXT job, or type 'q' to QUIT: ")
-        
-        if user_input.lower() == 'q':
-            print("🛑 Stopping the session. Rest up!")
-            break
+        url = job.get('link')
 
-    print("\n🎉 Batch complete! Run the script again whenever you want to tackle the next 10.")
+        print("\n" + "="*60)
+        print(f"🚀 Processing [{index + 1}/{len(active_batch)}]: {title} @ {company}")
+        print("="*60)
+
+        try:
+            status, outcome_message = apply_to_job(url)
+
+            if status == "quit":
+                print("🛑 Batch runner paused by user request.")
+                break
+
+            record_job(url, status, outcome_message)
+
+        except Exception as err:
+            print(f"💥 Critical error handling job webpage: {err}")
+            record_job(url, "failed", str(err))
+            continue
 
 if __name__ == "__main__":
     run_mass_apply()

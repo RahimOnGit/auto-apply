@@ -1,56 +1,87 @@
-# Auto-Apply
+# 🚀 Auto Apply
+## Smart Job Automator & Mass Applier (AI-Powered)
 
-A minimal Python/Playwright script that auto‑fills job‑application forms using your personal CV, cover letter and contact info stored in a JSON file.
+A modular, highly automated pipeline designed to streamline the job application workflow. This tool manages massive databases of job opportunities, routes cleanly through middleman boards like Arbetsförmedlingen, leverages **Groq AI (LLaMA 3)** to solve dynamic screening questionnaires on the fly, and maintains a strict local history tracker.
 
-## 📂 Project layout
-```
-auto-apply/
-├─ auto_apply.py      # main automation script
-├─ my_info.json       # your personal data (editable)
-├─ CV.pdf             # your résumé (place here)
-└─ CoverLetter.pdf   # your cover letter (place here)
-```
+## 🛠 Features
 
-## 🛠️ Prerequisites
-- **Python 3.8+**
-- **Playwright** (`pip install playwright`) and its browsers (`playwright install`)
-- Your CV and cover letter PDFs in the project folder
-
-## ⚙️ Setup
-```bash
-# Clone or copy the folder to E:\Projects\auto-apply
-cd E:\Projects\auto-apply
-# Install dependencies
-pip install -r <(pip freeze | grep playwright)   # or simply:
-pip install playwright
-# Install browsers for Playwright
-playwright install
-```
-
-## ▶️ Usage
-Edit `my_info.json` with your real details, then run:
-```bash
-python auto_apply.py
-```
-The script will launch a **visible** Chromium window, navigate to the URL you pass to `apply_to_job`, fill the fields and upload the files. When the form is done you get a prompt – hit **Enter** in the terminal after you manually submit the form.
-
-### Example
-```python
-if __name__ == "__main__":
-    apply_to_job("https://example.com/job-application-form")
-```
-Replace the URL with the actual job‑application page you want to target.
-
-## 🔧 Customising selectors
-Playwright uses CSS selectors to locate form inputs. If a site uses different names/ids, edit the `page.fill` / `page.set_input_files` calls in `auto_apply.py` accordingly.
-
-### Advanced tweaks
-- **`exact=True` on “Jag samtycker”** – forces Playwright to click the exact label text next to the fake checkbox, skipping the long legal‑text block.
-- **`force=True` on `#pul`** – overrides visibility checks so a hidden real checkbox can be toggled even when covered by design elements.
-- **Refined button targeting** – uses a precise selector `<input type="submit" value="Skicka" />` via the standard button‑role helper, making the submit click reliable across layout changes.
-
-## 📜 License
-Feel free to use, tweak, or pirate this snippet – it’s yours.
+* **🧠 Groq AI Core (LLaMA 3):** Automatically evaluates custom screening checkmarks, language checks (e.g., *"Talar du svenska?"*), and dynamic radio fields using cloud-based LLM context mapping based on your professional profile.
+* **🔗 Nested Middleman Piercing:** Dynamically scans intermediate landing interfaces (like SuccessFactors, Workday, etc.) to target and click custom "Apply Now" anchors or wrapper popups automatically.
+* **💾 Stateful Job Tracker:** Maintains an exact audit trail (`job_history.json`). It records jobs as `applied`, `skipped`, or `failed` (with explicit error codes) so the engine never opens or wastefully processes the same URL twice.
+* **📧 Automated Mail Draft Generation:** Identifies pages requesting application via email, evaluates the text context to determine language, and auto-generates a pre-formatted `mailto:` package (Subject + full Body cover letter) directly inside your native operating system mail client.
+* **🛡 Targeted Authentication Detection:** Isolates form and body markup areas to prevent global navigation login options from triggering false-positive BankID holds while keeping absolute compliance pauses when authentication is mandatory.
 
 ---
-*Created by Rah Elhaj – your personal AI sidekick.*
+
+## 📁 File Structure
+
+* `mass_apply.py`: The main orchestrator loop. It reads the master database, filters out already processed logs via the tracker, sorts by priority score, and runs controlled batches of 10.
+* `auto_apply.py`: The absolute mechanical workhorse. Handles browser contexts, field input bindings, smart bilingual file selections, Groq API inference connections, and target submit clicks.
+* `routers.py`: Dedicated platform-routing scripts handling the deep logic for cracking middleman domains and identifying transitional redirect anchors.
+* `tracker.py`: Simple, transactional JSON handler managing state tracking, write locks, and diagnostic outcome strings.
+* `.env`: A protected environment configuration holding your private API tokens.
+* `my_info.json`: Contains structured identity nodes, current positioning data, and raw data profiles for both English and Swedish cover letters.
+
+---
+
+## ⚙️ Project Setup
+
+### 1. Installation Dependencies
+
+Install the required execution layers and build standard Playwright browser binaries inside your terminal:
+
+```bash
+pip install playwright groq
+playwright install
+
+```
+
+### 2. Configure Credentials (`.env`)
+
+Create a file named exactly `.env` inside the root directory and append your Groq deployment credentials:
+
+```env
+GROQ_API_KEY=gsk_your_actual_groq_api_key_string_here...
+
+```
+
+### 3. Verification Files Setup
+
+Ensure your profile details inside `my_info.json` are accurate and make sure your matching portfolio files live in the same root folder:
+
+* 📄 `cv-fullstack.pdf` (English Version)
+* 📄 `new-cv-fullstack-svenska.pdf` (Swedish Version)
+* 📄 `Cover-Letter.pdf` (English Version)
+* 📄 `personligt-brev.pdf` (Swedish Version)
+
+---
+
+## 🚀 Execution Workflows
+
+### Standard Batch Execution
+
+To kick off the automated pipeline and process your database tracking allocations:
+
+```bash
+python mass_apply.py
+
+```
+
+### Direct Isolated Single-Job Diagnostics
+
+If you ever want to test changes to form-filling or check a specific complex site design layout without checking the full JSON database layer, you can execute a standalone pass at the bottom of `auto_apply.py`:
+
+```bash
+python auto_apply.py
+
+```
+
+---
+
+## 🧠 Interactive Human-In-The-Loop Commands
+
+When the automation completes its sequence actions on a page, it yields terminal control to you so you stay perfectly in charge of the absolute final click sequence:
+
+* **`ENTER` (Blank Input):** Saves the target job asset as `applied` to your history logs and immediately spins up the next open URL link.
+* **`s` + `ENTER`:** Logs the asset target as `skipped` in your tracking history (will not open again) and proceeds.
+* **`q` + `ENTER`:** Gracefully safely closes active headless browser instances and shuts down the core orchestrator loops cleanly.
