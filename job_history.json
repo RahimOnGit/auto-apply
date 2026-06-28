@@ -158,5 +158,200 @@
         "status": "failed",
         "reason": "Locator.count: Target page, context or browser has been closed",
         "timestamp": "2026-05-23 15:42:29"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31012886": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-30 14:03:06"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31012490": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <main class=\"relative px-4 pt-20 pb-20 bg-company-secondary-fallback text-company-secondary\">…</main> aka get_by_role(\"main\")\n    2) <form method=\"post\" data-remote=\"true\" accept-charset=\"UTF-8\" novalidate=\"novalidate\" id=\"job-application-form\" class=\"mx-auto max-w-650\" data-turbo-frame=\"application_form\" action=\"https://jobs.gigstep.se/applications\" data-careersite--form-form-class=\"pointer-events-none\" data-controller=\"careersite--form careersite--messenger-token\" data-careersite--messenger-token-candidate-endpoint-value=\"/candidates\" data-careersite--form-qualifying-questions-message-wrapper-class=\"hidden\" data-action=\"questio…>…</form> aka locator(\"#job-application-form\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-30 14:03:11"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31007217": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <form role=\"search\" aria-label=\"Sök på webbplatsen\" class=\"searchbox__form js-searchbox__form\">…</form> aka locator(\"form\")\n    2) <main role=\"main\" id=\"svid10_7f0846ac15f0dd8153b12e66\" class=\"sv-vertical sv-layout sv-template-layout\">…</main> aka get_by_text(\"Start Production: trueNy sö\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-30 14:03:44"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30994803": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-30 14:04:13"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30940163": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <main class=\"relative px-4 pt-20 pb-20 bg-company-secondary-fallback text-company-secondary\">…</main> aka get_by_role(\"main\")\n    2) <form method=\"post\" data-remote=\"true\" accept-charset=\"UTF-8\" novalidate=\"novalidate\" id=\"job-application-form\" class=\"mx-auto max-w-650\" data-turbo-frame=\"application_form\" action=\"https://jobs.gigstep.se/applications\" data-careersite--form-form-class=\"pointer-events-none\" data-controller=\"careersite--form careersite--messenger-token\" data-careersite--messenger-token-candidate-endpoint-value=\"/candidates\" data-careersite--form-qualifying-questions-message-wrapper-class=\"hidden\" data-action=\"questio…>…</form> aka locator(\"#job-application-form\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-30 14:04:18"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30938916": {
+        "status": "failed",
+        "reason": "Locator.inner_text: Error: strict mode violation: locator(\"form, main, #content\") resolved to 2 elements:\n    1) <form role=\"search\" aria-label=\"Sök på webbplatsen\" class=\"searchbox__form js-searchbox__form\">…</form> aka locator(\"form\")\n    2) <main role=\"main\" id=\"svid10_7f0846ac15f0dd8153b12e66\" class=\"sv-vertical sv-layout sv-template-layout\">…</main> aka get_by_text(\"Start Production: trueNy sö\")\n\nCall log:\n  - waiting for locator(\"form, main, #content\")\n",
+        "timestamp": "2026-05-30 14:04:51"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30907413": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-30 14:14:52"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30888654": {
+        "status": "failed",
+        "reason": "'tuple' object has no attribute 'locator'",
+        "timestamp": "2026-05-30 14:16:40"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31007719": {
+        "status": "failed",
+        "reason": "'tuple' object has no attribute 'locator'",
+        "timestamp": "2026-05-30 14:17:15"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31003371": {
+        "status": "failed",
+        "reason": "'tuple' object has no attribute 'locator'",
+        "timestamp": "2026-05-30 14:17:25"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30976211": {
+        "status": "failed",
+        "reason": "'tuple' object has no attribute 'locator'",
+        "timestamp": "2026-05-30 14:17:35"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30906530": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-30 14:32:34"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30598399": {
+        "status": "failed",
+        "reason": "name 'url' is not defined",
+        "timestamp": "2026-05-30 14:32:38"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31043059": {
+        "status": "failed",
+        "reason": "name 'url' is not defined",
+        "timestamp": "2026-05-30 14:32:42"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31033674": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-30 14:32:52"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31030818": {
+        "status": "failed",
+        "reason": "name 'url' is not defined",
+        "timestamp": "2026-05-30 14:32:56"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31027955": {
+        "status": "failed",
+        "reason": "name 'url' is not defined",
+        "timestamp": "2026-05-30 14:32:59"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31019483": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-30 14:33:10"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31017749": {
+        "status": "failed",
+        "reason": "name 'url' is not defined",
+        "timestamp": "2026-05-30 14:33:14"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31016150": {
+        "status": "failed",
+        "reason": "name 'url' is not defined",
+        "timestamp": "2026-05-30 14:33:17"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30995945": {
+        "status": "applied",
+        "reason": "Handled via automated email client generation.",
+        "timestamp": "2026-05-30 14:33:30"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30995266": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:51:10"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30984080": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:51:18"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30981598": {
+        "status": "expired",
+        "reason": "Ansökningstiden har gått ut",
+        "timestamp": "2026-05-30 14:51:22"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30971891": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:51:34"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30876702": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:51:43"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30861895": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:51:51"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30827510": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:52:27"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30814012": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:53:15"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30777962": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:54:04"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30530186": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 14:54:52"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30365029": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 15:35:53"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31036567": {
+        "status": "applied",
+        "reason": "Successfully completed submission logic.",
+        "timestamp": "2026-05-30 15:44:33"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30970855": {
+        "status": "expired",
+        "reason": "Ansökningstiden har gått ut",
+        "timestamp": "2026-05-30 15:44:36"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/30723031": {
+        "status": "expired",
+        "reason": "Ansökningstiden har gått ut",
+        "timestamp": "2026-06-28 08:38:44"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31046876": {
+        "status": "expired",
+        "reason": "Ansökningstiden har gått ut",
+        "timestamp": "2026-06-28 08:38:47"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31054142": {
+        "status": "expired",
+        "reason": "Ansökningstiden har gått ut",
+        "timestamp": "2026-06-28 08:38:51"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31091775": {
+        "status": "skipped",
+        "reason": "User manually skipped recording this job.",
+        "timestamp": "2026-06-28 08:42:24"
+    },
+    "https://arbetsformedlingen.se/platsbanken/annonser/31127955": {
+        "status": "skipped",
+        "reason": "User manually skipped recording this job.",
+        "timestamp": "2026-06-28 08:43:00"
     }
 }

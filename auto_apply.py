@@ -25,63 +25,174 @@ with open(os.path.join(BASE_DIR, 'my_info.json'), 'r', encoding='utf-8') as file
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
-def ask_groq_ai(question_context):
-    """Sends form questions to Groq's cloud using LLaMA 3"""
+def ask_groq_ai(question_context, context_type="essay", options=None):
+    """Uses Groq LLaMA 3 to answer dynamic text scenarios or radio choice prompts."""
     if not GROQ_API_KEY:
-        print("⚠️ No GROQ_API_KEY found in .env. Falling back to default 'yes'.")
-        return "yes"
+        return "yes" if context_type == "radio" else "Please contact me for details."
 
     try:
         from groq import Groq
         client = Groq(api_key=GROQ_API_KEY)
 
-        prompt = f"""
-        You are an AI managing a job application form for Abdelrahim Elhaj.
-        User Background: Fullstack Developer student. Finished an internship at FBK Balkan building web apps with Spring Boot, React, and TypeScript. Speaks Swedish (professional/working proficiency) and English.
+        # Core background injected directly into the prompt profile
+        profile_backstory = """
+        You are an AI assistant representing Abdelrahim Elhaj for a job application form field.
+        Profile: Fullstack Developer student at Teknikhögskolan living in Malmö, Sweden.
+        Skills: Java (Spring Boot), Spring Security, React, TypeScript, SQL, PostgreSQL, SQLite, Git, Agile/Scrum.
+        Experience: Served as Scrum Master and Backend Engineer on a Youth Portal application for the football club FBK Balkan.
+        Built automated data sync structures pulling real-time statistics from the Swedish Football Association (SvFF) API.
+        Eligibility: Fully eligible to work in Sweden (lives locally in Malmö).
+        Language Proficiency: Professional working competency in Swedish; fluent in English.
         
-        Form Question Found on Page: "{question_context}"
-        
-        Task: If this is a Yes/No type question, reply with exactly 'yes' or 'no'. Otherwise, give a brief, accurate response based on his background. Reply with ONLY the answer.
+        A technical challenge story you can use if asked about bugs:
+        "While building the FBK Balkan match synchronization engine using the SvFF API, an asynchronous scheduler lacked 
+        proper transactional boundaries (@Transactional). Under API latency spikes, this caused PostgreSQL connection pool 
+        saturation and left orphan tracking records. I analyzed the Hibernate connection logs, found the rollback leak, 
+        and resolved it by optimizing batch scopes and configuring explicit pool execution timeouts."
         """
 
-        # HERE IS THE MODEL RUNNING ON GROQ'S CLOUD
+        if context_type == "radio":
+            prompt = f"""
+            {profile_backstory}
+            
+            Question asked on form: "{question_context}"
+            Available options to select from: {options}
+            
+            Task: Which specific option from the list fits his background best?
+            Respond with ONLY the exact string or text of the best option from the list. Do not explain your choice.
+            """
+        else:
+            prompt = f"""
+            {profile_backstory}
+            
+            Question asked on form: "{question_context}"
+            
+            Task: Write a professional, concise, short answer (1-3 sentences maximum) for this textbox field representing his background accurately. 
+            Write the response in the same language as the question (Swedish or English). Do not include quotes.
+            """
+
         completion = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="openai/gpt-oss-20b",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-            max_tokens=20
+            temperature=0.2,
+            max_tokens=1500
         )
-        response = completion.choices[0].message.content.strip().lower()
-        print(f"🤖 Groq AI analyzed question and decided: '{response}'")
-        return response
+        return completion.choices[0].message.content.strip()
     except Exception as e:
-        print(f"⚠️ Groq AI encountered an error: {e}")
-        return "yes"
+        print(f"⚠️ Groq inference anomaly: {e}")
+        return "Yes" if context_type == "radio" else "See attached CV."
+
 
 def handle_custom_questions(page):
-    """Scans the page for tricky screening questions (like language checks)"""
-    print("🧠 Scanning for custom screening questions...")
-    try:
-        lang_context = page.locator("body").inner_text()
-        if "talar du svenska" in lang_context.lower() or "språk" in lang_context.lower():
-            ai_decision = ask_groq_ai("Talar du svenska på en professionell nivå? (motsvarande C1 eller högre)")
+    """Scans for and completely fills out dynamic textareas and multiple-choice radio fields on the fly."""
+    print("🧠 Scanning for dynamic form fields and custom questions...")
 
-            if ai_decision == "yes":
-                for target_label in ["Ja", "Yes", "Stämmer", "True"]:
-                    radio = page.get_by_label(target_label, exact=False).first
-                    if radio.is_visible(timeout=500):
-                        radio.check(force=True)
-                        print(f"✓ Checked radio option: '{target_label}'")
-                        return
+    # === PART A: RESOLVE ESSAY & SHORT TEXT FIELDS ===
+    try:
+        # Catch textareas and long text inputs
+        text_fields = page.locator("textarea, input[type='text']").all()
+        for field in text_fields:
+            # Skip if the field is hidden, disabled, or already has an autofilled value
+            if not field.is_visible() or field.is_disabled() or field.input_value():
+                continue
+
+            # Skip standard profile tracking fields to avoid messing up contact info
+            field_name = (field.get_attribute("name") or "").lower()
+            field_id = (field.get_attribute("id") or "").lower()
+            if any(x in field_name or x in field_id for x in ["name", "email", "phone", "mobil", "epost", "password", "title", "titel"]):
+                continue
+
+            # Extract the closest question label text for this element
+            question_text = ""
+            if field_id:
+                label_loc = page.locator(f"label[for='{field_id}']")
+                if label_loc.count() > 0:
+                    question_text = label_loc.first.inner_text()
+
+            if not question_text:
+                # Fallback: scan closest container tag text blocks
+                question_text = field.evaluate("""el => {
+                    let container = el.closest('.form-group, .form-row, div[class*="field"], label');
+                    return container ? container.innerText : '';
+                }""")
+
+            # If we found a question, let Groq fill it
+            if question_text and len(question_text.strip()) > 5:
+                clean_question = question_text.split('\n')[0].strip() # target first header line
+                print(f"❓ Found text question: '{clean_question}'")
+                ai_answer = ask_groq_ai(clean_question, context_type="essay")
+                field.fill(ai_answer)
+                print(f"✓ AI filled answer text layout.")
     except Exception as e:
-        print(f"⚠️ Screening question check skipped: {e}")
+        print(f"⚠️ Text field handling loop anomaly: {e}")
+
+    # === PART B: RESOLVE DYNAMIC RADIO BUTTONS ===
+    try:
+        radios = page.locator("input[type='radio']").all()
+        # Group individual radios by their shared 'name' attribute
+        radio_groups = {}
+        for r in radios:
+            name = r.get_attribute("name")
+            if name:
+                radio_groups.setdefault(name, []).append(r)
+
+        for name, elements in radio_groups.items():
+            # Skip group entirely if you already selected something manually or automatically
+            if any(el.is_checked() for el in elements):
+                continue
+
+            # Grab the parent block inner text to read the main question context heading
+            first_radio = elements[0]
+            group_context = first_radio.evaluate("""el => {
+                let container = el.closest('fieldset, .form-group, .form-row, div[class*="question"], div[class*="block"]');
+                if (!container) container = el.parentElement.parentElement;
+                return container ? container.innerText : '';
+            }""")
+
+            if group_context:
+                # Scrape the specific labels for the options in this specific radio group
+                options_map = []
+                for el in elements:
+                    rad_id = el.get_attribute("id")
+                    opt_label = ""
+                    if rad_id:
+                        lbl = page.locator(f"label[for='{rad_id}']")
+                        if lbl.count() > 0:
+                            opt_label = lbl.first.inner_text()
+                    if not opt_label:
+                        opt_label = el.evaluate("el => el.parentElement.innerText")
+                    options_map.append({"element": el, "text": opt_label.strip()})
+
+                # Clean question header extraction
+                clean_question = group_context.split('\n')[0].strip()
+                just_options_text = [opt["text"] for opt in options_map if opt["text"]]
+
+                if just_options_text:
+                    print(f"❓ Found radio question: '{clean_question}' with options {just_options_text}")
+                    ai_choice = ask_groq_ai(clean_question, context_type="radio", options=just_options_text)
+
+                    # Target and click the specific radio button matching Groq's text selection
+                    for opt in options_map:
+                        if ai_choice.lower() in opt["text"].lower() or opt["text"].lower() in ai_choice.lower():
+                            opt["element"].check(force=True)
+                            print(f"✓ AI selected choice option: '{opt['text']}'")
+                            break
+    except Exception as e:
+        print(f"⚠️ Radio field selection loop anomaly: {e}")
 
 def handle_email_application(page, job_title):
+    """
+    Detects email-only application pages and opens a pre-filled mailto: link.
+    NOTE: This must be called AFTER routing so it runs on the real company page,
+    not on the Arbetsförmedlingen listing (which often has contact emails in the
+    sidebar that are NOT the application address).
+    """
     try:
         page_text = page.inner_text("body").lower()
         mail_links = page.locator('a[href^="mailto:"]').all()
         for link in mail_links:
-            if not link.is_visible(timeout=500): continue
+            if not link.is_visible(timeout=500):
+                continue
             parent_text = link.locator("..").inner_text().lower()
             email = link.get_attribute('href').replace('mailto:', '').strip()
 
@@ -90,7 +201,10 @@ def handle_email_application(page, job_title):
                 send_email(page, email, job_title)
                 return "email_opened"
 
-        mail_match = re.search(r'ansök via mail:?\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', page_text, re.IGNORECASE)
+        mail_match = re.search(
+            r'ansök via mail:?\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})',
+            page_text, re.IGNORECASE
+        )
         if mail_match:
             email = mail_match.group(1)
             print(f"📧 EMAIL APPLICATION DETECTED → {email}")
@@ -119,7 +233,7 @@ def fill_field_by_aliases(page, labels, value):
                 return
         except: continue
 
-def apply_to_job(job_url):
+def apply_to_job(job_url):                          # ← parameter is job_url throughout
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         context = browser.new_context()
@@ -133,22 +247,41 @@ def apply_to_job(job_url):
             browser.close()
             return "failed", f"Navigation timeout: {str(e)}"
 
-        # 1. Email Check
-        email_status = handle_email_application(page, job_title=job_url.split('/')[-1] or "Fullstack Developer")
+        # ── Step 1: Route through Arbetsförmedlingen / nested ATS ────────────
+        # FIX: was passing undefined `url` — now correctly passes `job_url`.
+        # FIX: unpack tuple — handle_arbetsformedlingen returns (page, status_override).
+        page, status_override = handle_arbetsformedlingen(page, context, job_url)
+        if status_override == "expired":
+            browser.close()
+            return "expired", "Ansökningstiden har gått ut"
+
+        # ── Step 2: Email check — runs on the REAL company page now ──────────
+        # FIX: moved AFTER routing so AF sidebar contact emails don't trigger
+        # false positives before we even reach the actual application page.
+        job_title = job_url.split('/')[-1] or "Fullstack Developer"
+        email_status = handle_email_application(page, job_title=job_title)
         if email_status:
             user_choice = input("👉 ENTER = Mark Applied & Continue | q = Quit: ")
             browser.close()
+            if user_choice.lower() == 'q':
+                return "quit", "Session stopped by user."
             return "applied", "Handled via automated email client generation."
 
-        # 2. Run through router (Handles Arbetsförmedlingen AND the nested SuccessFactors/Apply buttons)
-        page = handle_arbetsformedlingen(page, context, job_url)
+        # ── Step 3: BankID / authentication detection ────────────────────────
+        try:
+            form_body = (
+                page.locator("form, main, #content").inner_text().lower()
+                if page.locator("form").count() > 0
+                else page.content().lower()
+            )
+        except Exception:
+            form_body = ""
 
-        # 3. Security Check (Isolating the form content to prevent header false positives)
-        form_body = page.locator("form, main, #content").inner_text().lower() if page.locator("form").count() > 0 else page.content().lower()
         if any(x in form_body for x in ["mobilt bankid", "e-legitimation"]):
             print("\n⚠️ BankID signature portal detected. Awaiting manual authentication!")
-            input("👉 Complete BankID manually in the browser window, then press ENTER here to let the script finish...")
+            input("👉 Complete BankID manually in the browser window, then press ENTER here...")
 
+        # ── Step 4: Fill profile fields ──────────────────────────────────────
         print("\n🖊️ Filling profile info...")
         fill_field_by_aliases(page, ["First name", "First Name", "Förnamn", "Tilltalsnamn"], me.get('first_name'))
         fill_field_by_aliases(page, ["Last name", "Last Name", "Efternamn"], me.get('last_name'))
@@ -156,10 +289,10 @@ def apply_to_job(job_url):
         fill_field_by_aliases(page, ["Phone", "Mobile", "Telefon", "Telefonnummer"], me.get('phone'))
         fill_field_by_aliases(page, ["Title", "Role", "Titel"], me.get('title'))
 
-        # Run the Groq AI checker for screening questions
+        # ── Step 5: Groq AI screening questions ──────────────────────────────
         handle_custom_questions(page)
 
-        # Smart Document Uploading
+        # ── Step 6: Smart document upload ────────────────────────────────────
         try:
             text_context = page.inner_text("body").lower()
             is_eng = any(x in text_context for x in ["apply now", "resume", "english"])
@@ -174,15 +307,23 @@ def apply_to_job(job_url):
                 if file_inputs.count() > 1:
                     file_inputs.nth(1).set_input_files(os.path.join(BASE_DIR, files["cl"]))
                     print(f"✓ Attached: {files['cl']}")
-        except:
+        except Exception:
             print("⚠️ File upload input skipped.")
 
+        # ── Step 7: Consent checkbox ──────────────────────────────────────────
         print("\n📋 Validation processing...")
-        try: page.get_by_text("Jag samtycker").click(timeout=1000)
-        except: pass
+        try:
+            page.get_by_text("Jag samtycker").click(timeout=1000)
+        except Exception:
+            pass
 
-        # Submit Strategy
-        submit_selectors = ["button:has-text('Ansök')", "button:has-text('Apply')", "button:has-text('Submit')", "input[type='submit']"]
+        # ── Step 8: Submit ────────────────────────────────────────────────────
+        submit_selectors = [
+            "button:has-text('Ansök')",
+            "button:has-text('Apply')",
+            "button:has-text('Submit')",
+            "input[type='submit']",
+        ]
         for selector in submit_selectors:
             try:
                 btn = page.locator(selector).first
@@ -190,7 +331,8 @@ def apply_to_job(job_url):
                     btn.dispatch_event("click")
                     print(f"🚀 Clicked submission button: {selector}")
                     break
-            except: continue
+            except Exception:
+                continue
 
         user_choice = input("👉 ENTER = Mark Applied & Continue | s = Skip tracking | q = Quit: ")
         browser.close()
@@ -203,6 +345,5 @@ def apply_to_job(job_url):
         return "applied", "Successfully completed submission logic."
 
 if __name__ == "__main__":
-    # If you run auto_apply.py directly, it will test this link!
     print("Executing standalone single-job test...")
-    apply_to_job("https://arbetsformedlingen.se/platsbanken/annonser/29037463")
+    apply_to_job("https://arbetsformedlingen.se/platsbanken/annonser/31073897")
