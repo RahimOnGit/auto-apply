@@ -253,40 +253,131 @@ def handle_arbetsformedlingen(page, context, job_url):
 
     return page, None
 
+def check_for_nested_apply(page, context, depth=0, max_depth=4):
+    """
+    LONG-TERM FIX: Recursively drills through middleman pages.
+    Instead of fighting UI banners with clicks, it extracts the raw hrefs and teleports directly.
+    """
+    if not page or depth >= max_depth:
+        return page
 
-def check_for_nested_apply(page, context):
-    """
-    Finds and clicks the nested 'Apply now' button on company / ATS pages.
-    Rule-based selectors run first; Groq oracle fires only if all fail.
-    """
-    rule_selectors = [
-        "button:has-text('Apply now')",
-        "button:has-text('Ansök nu')",
-        "button:has-text('Sök tjänsten')",
-        "button:has-text('Apply here')",
-        "a:has-text('Apply now')",
+    # 🛑 GUARD 1: Destination reached check
+    try:
+        if page.locator("input[type='file'], textarea, input[name*='resume']").count() > 0:
+            print("🎯 Destination reached: Active application form detected.")
+            return page
+    except:
+        pass
+
+    initial_url = page.url
+    initial_pages_count = len(context.pages)
+
+    # 🛠️ SPECIFIC STRUCTURAL & TEXT SELECTORS
+    transition_selectors = [
+        "a[href*='positionquick']",
+        "a[href*='/apply/']",
+        "a[href*='apply-gate']",
+        ".btn-apply",
+        ".apply-button",
+        "a:has-text('Sök jobbet')",
+        "a:has-text('Ansök här')",
         "a:has-text('Ansök nu')",
-        "a:has-text('Sök tjänsten')",
-        "a:has-text('Apply here')",
-        "a.b_cta--button",                 # SuccessFactors
-        "a[href*='successfactors.eu']",
-        "a[href*='workday.com']",
-        "a[href*='greenhouse.io']",
-        "a[href*='lever.co']",
-        "a[href*='teamtailor.com']",
-        "a[href*='recruitee.com']",
+        "a:has-text('Apply now')",
+        "button:has-text('Ansök')",
+        "button:has-text('Apply')",
+        "a:has-text('Gå till ansökan')",
+        "a[href*='successfactors']"
     ]
 
-    result_page = _try_selectors(page, context, rule_selectors)
-    if result_page is not page:
-        return result_page
+    # 🛡️ THE BLACKLIST
+    login_blacklist = [
+        "logga in", "login", "sign in", "skapa konto",
+        "register", "mitt konto", "my account", "connect"
+    ]
 
-    # ── Groq fallback ─────────────────────────────────────────────────────────
-    groq_selector = _groq_find_apply_selector(page)
-    if groq_selector:
-        result_page = _try_selectors(page, context, [groq_selector])
-        if result_page is not page:
-            return result_page
-        print("⚠️ Groq selector didn't match any visible element.")
+    # --- Phase 1: Fast Rule-Based Matching ---
+    for selector in transition_selectors:
+        try:
+            elements = page.locator(selector).all()
+            for element in elements:
+                if not element.is_visible(timeout=500):
+                    continue
 
+                text_content = (element.inner_text() or "").lower()
+                raw_href = element.get_attribute("href")
+                href_lower = (raw_href or "").lower()
+
+                if any(bad_word in text_content or bad_word in href_lower for bad_word in login_blacklist):
+                    continue
+
+                print(f"🔗 [Layer {depth + 1}] Target matched: '{selector}' ('{text_content.strip()}').")
+
+                # 🚀 THE SILVER BULLET: Bypass UI completely and route directly via URL
+                if raw_href and not raw_href.startswith("#") and "javascript" not in href_lower:
+                    from urllib.parse import urljoin
+                    full_url = urljoin(page.url, raw_href)
+                    print(f"⚡ Bypassing UI click — Teleporting directly to: {full_url}")
+
+                    try:
+                        page.goto(full_url, timeout=15000)
+                        page.wait_for_load_state("domcontentloaded")
+                        return check_for_nested_apply(page, context, depth + 1, max_depth)
+                    except Exception as e:
+                        print(f"⚠️ Direct route failed: {e}. Falling back to DOM click...")
+
+                # Standard Click Fallback (For button tags, SPAs, and weird JS overlays)
+                next_page = None
+                try:
+                    with context.expect_popup(timeout=3000) as popup_info:
+                        element.click(force=True) # force=True ignores sticky cookie banners blocking the element
+                    next_page = popup_info.value
+                except Exception:
+                    if len(context.pages) > initial_pages_count:
+                        next_page = context.pages[-1]
+                    else:
+                        next_page = page
+
+                next_page.wait_for_load_state("domcontentloaded", timeout=4000)
+
+                # Give inline SPAs a second to render the form before recursing
+                if next_page == page and page.url == initial_url:
+                    page.wait_for_timeout(1500)
+
+                # Always recurse. If it's a dead end, depth limit (max_depth=4) safely kills it.
+                return check_for_nested_apply(next_page, context, depth + 1, max_depth)
+        except Exception:
+            continue
+
+    # --- Phase 2: Groq AI Oracle Fallback ---
+    print(f"🤖 Fast rules exhausted on Layer {depth + 1}. Letting Groq AI scan the DOM...")
+
+    # We still keep the AI oracle you built as the absolute last resort
+    ai_selector = _groq_find_apply_selector(page)
+    if ai_selector:
+        try:
+            ai_element = page.locator(ai_selector).first
+            if ai_element.is_visible(timeout=2000):
+                print(f"🧠 [Layer {depth + 1}] AI successfully locked onto target: '{ai_selector}'. Clicking...")
+
+                next_page = None
+                try:
+                    with context.expect_popup(timeout=3000) as popup_info:
+                        ai_element.click(force=True)
+                    next_page = popup_info.value
+                except Exception:
+                    if len(context.pages) > initial_pages_count:
+                        next_page = context.pages[-1]
+                    else:
+                        next_page = page
+
+                next_page.wait_for_load_state("domcontentloaded", timeout=4000)
+
+                if next_page == page and page.url == initial_url:
+                    page.wait_for_timeout(1500)
+
+                return check_for_nested_apply(next_page, context, depth + 1, max_depth)
+        except Exception as e:
+            print(f"⚠️ AI locator misfire: {e}")
+
+    # If everything fails, we assume this is the final form context
     return page

@@ -26,7 +26,7 @@ with open(os.path.join(BASE_DIR, 'my_info.json'), 'r', encoding='utf-8') as file
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 def ask_groq_ai(question_context, context_type="essay", options=None):
-    """Uses Groq LLaMA 3 to answer dynamic text scenarios or radio choice prompts."""
+    """Uses Groq to answer dynamic text scenarios or radio choice prompts."""
     if not GROQ_API_KEY:
         return "yes" if context_type == "radio" else "Please contact me for details."
 
@@ -34,7 +34,6 @@ def ask_groq_ai(question_context, context_type="essay", options=None):
         from groq import Groq
         client = Groq(api_key=GROQ_API_KEY)
 
-        # Core background injected directly into the prompt profile
         profile_backstory = """
         You are an AI assistant representing Abdelrahim Elhaj for a job application form field.
         Profile: Fullstack Developer student at Teknikhögskolan living in Malmö, Sweden.
@@ -72,7 +71,7 @@ def ask_groq_ai(question_context, context_type="essay", options=None):
             """
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
             max_tokens=1500
@@ -82,6 +81,43 @@ def ask_groq_ai(question_context, context_type="essay", options=None):
         print(f"⚠️ Groq inference anomaly: {e}")
         return "Yes" if context_type == "radio" else "See attached CV."
 
+def ask_groq_navigation_strategy(error_desc, page_text=""):
+    """Asks Groq to analyze a broken navigation state or page error and decide the next strategic move."""
+    if not GROQ_API_KEY:
+        return "SKIP"
+
+    try:
+        from groq import Groq
+        client = Groq(api_key=GROQ_API_KEY)
+
+        prompt = f"""
+        You are an AI error-handling agent for an automated job application script.
+        The browser just encountered a problem or an unusual page state while opening a job link.
+        
+        Error Message Captured: "{error_desc}"
+        Page Text Snippet (if any): "{page_text[:800]}"
+        
+        Analyze the scenario and pick the absolute best recovery strategy from these choices:
+        - 'RETRY': Use this if it looks like a minor network glitch, temporary 502/503 server lag, or a slow load a refresh might fix.
+        - 'HUMAN': Use this if there is a Cloudflare Turnstile, CAPTCHA puzzle, cookie modal fully blocking the view, or a login wall requiring eyes.
+        - 'SKIP': Use this if it's an explicit 404 error, expired job posting, access denied, or completely broken landing URL.
+        
+        Respond with ONLY one word: RETRY, HUMAN, or SKIP. Do not include punctuation or explanations.
+        """
+
+        # 🛠️ FIXED: Changed decommissioned llama3-8b-8192 to active model ID
+        completion = client.chat.completions.create(
+            model="openai/gpt-oss-20b",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,
+            max_tokens=10
+        )
+        decision = completion.choices[0].message.content.strip().upper()
+        print(f"🤖 Groq AI Navigation Copilot decided: '{decision}'")
+        return decision
+    except Exception as e:
+        print(f"⚠️ Navigation AI analyzer failed: {e}")
+        return "SKIP"
 
 def handle_custom_questions(page):
     """Scans for and completely fills out dynamic textareas and multiple-choice radio fields on the fly."""
@@ -89,20 +125,16 @@ def handle_custom_questions(page):
 
     # === PART A: RESOLVE ESSAY & SHORT TEXT FIELDS ===
     try:
-        # Catch textareas and long text inputs
         text_fields = page.locator("textarea, input[type='text']").all()
         for field in text_fields:
-            # Skip if the field is hidden, disabled, or already has an autofilled value
             if not field.is_visible() or field.is_disabled() or field.input_value():
                 continue
 
-            # Skip standard profile tracking fields to avoid messing up contact info
             field_name = (field.get_attribute("name") or "").lower()
             field_id = (field.get_attribute("id") or "").lower()
             if any(x in field_name or x in field_id for x in ["name", "email", "phone", "mobil", "epost", "password", "title", "titel"]):
                 continue
 
-            # Extract the closest question label text for this element
             question_text = ""
             if field_id:
                 label_loc = page.locator(f"label[for='{field_id}']")
@@ -110,15 +142,13 @@ def handle_custom_questions(page):
                     question_text = label_loc.first.inner_text()
 
             if not question_text:
-                # Fallback: scan closest container tag text blocks
                 question_text = field.evaluate("""el => {
                     let container = el.closest('.form-group, .form-row, div[class*="field"], label');
                     return container ? container.innerText : '';
                 }""")
 
-            # If we found a question, let Groq fill it
             if question_text and len(question_text.strip()) > 5:
-                clean_question = question_text.split('\n')[0].strip() # target first header line
+                clean_question = question_text.split('\n')[0].strip()
                 print(f"❓ Found text question: '{clean_question}'")
                 ai_answer = ask_groq_ai(clean_question, context_type="essay")
                 field.fill(ai_answer)
@@ -129,7 +159,6 @@ def handle_custom_questions(page):
     # === PART B: RESOLVE DYNAMIC RADIO BUTTONS ===
     try:
         radios = page.locator("input[type='radio']").all()
-        # Group individual radios by their shared 'name' attribute
         radio_groups = {}
         for r in radios:
             name = r.get_attribute("name")
@@ -137,11 +166,9 @@ def handle_custom_questions(page):
                 radio_groups.setdefault(name, []).append(r)
 
         for name, elements in radio_groups.items():
-            # Skip group entirely if you already selected something manually or automatically
             if any(el.is_checked() for el in elements):
                 continue
 
-            # Grab the parent block inner text to read the main question context heading
             first_radio = elements[0]
             group_context = first_radio.evaluate("""el => {
                 let container = el.closest('fieldset, .form-group, .form-row, div[class*="question"], div[class*="block"]');
@@ -150,7 +177,6 @@ def handle_custom_questions(page):
             }""")
 
             if group_context:
-                # Scrape the specific labels for the options in this specific radio group
                 options_map = []
                 for el in elements:
                     rad_id = el.get_attribute("id")
@@ -163,7 +189,6 @@ def handle_custom_questions(page):
                         opt_label = el.evaluate("el => el.parentElement.innerText")
                     options_map.append({"element": el, "text": opt_label.strip()})
 
-                # Clean question header extraction
                 clean_question = group_context.split('\n')[0].strip()
                 just_options_text = [opt["text"] for opt in options_map if opt["text"]]
 
@@ -171,7 +196,6 @@ def handle_custom_questions(page):
                     print(f"❓ Found radio question: '{clean_question}' with options {just_options_text}")
                     ai_choice = ask_groq_ai(clean_question, context_type="radio", options=just_options_text)
 
-                    # Target and click the specific radio button matching Groq's text selection
                     for opt in options_map:
                         if ai_choice.lower() in opt["text"].lower() or opt["text"].lower() in ai_choice.lower():
                             opt["element"].check(force=True)
@@ -181,12 +205,6 @@ def handle_custom_questions(page):
         print(f"⚠️ Radio field selection loop anomaly: {e}")
 
 def handle_email_application(page, job_title):
-    """
-    Detects email-only application pages and opens a pre-filled mailto: link.
-    NOTE: This must be called AFTER routing so it runs on the real company page,
-    not on the Arbetsförmedlingen listing (which often has contact emails in the
-    sidebar that are NOT the application address).
-    """
     try:
         page_text = page.inner_text("body").lower()
         mail_links = page.locator('a[href^="mailto:"]').all()
@@ -233,31 +251,61 @@ def fill_field_by_aliases(page, labels, value):
                 return
         except: continue
 
-def apply_to_job(job_url):                          # ← parameter is job_url throughout
+def apply_to_job(job_url):
+    # 🛠️ FIXED: Wrapped everything inside the 'with' block structure
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         context = browser.new_context()
         page = context.new_page()
 
         print(f"🌐 Navigating to: {job_url}")
-        try:
-            page.goto(job_url, timeout=45000)
-            page.wait_for_load_state("networkidle")
-        except Exception as e:
-            browser.close()
-            return "failed", f"Navigation timeout: {str(e)}"
+        navigation_success = False
+        retry_count = 0
+        import time
+
+        while not navigation_success:
+            try:
+                page.goto(job_url, timeout=25000)
+                page.wait_for_load_state("domcontentloaded")
+
+                body_text = ""
+                try: body_text = page.locator("body").inner_text().lower()
+                except: pass
+
+                if any(x in body_text for x in ["cloudflare", "error 404", "page not found", "access denied", "checking your browser"]):
+                    raise Exception("Suspicious, blocked, or broken page content detected on load.")
+
+                navigation_success = True
+
+            except Exception as e:
+                retry_count += 1
+                error_str = str(e)
+                current_html_text = ""
+                try: current_html_text = page.locator("body").inner_text()
+                except: pass
+
+                strategy = ask_groq_navigation_strategy(error_str, current_html_text)
+
+                if strategy == "RETRY" and retry_count < 2:
+                    print(f"🔄 AI suggested recovery retry. Re-attempting load [{retry_count}/2]...")
+                    time.sleep(2)
+                    continue
+                elif strategy == "HUMAN":
+                    print("\n🚨 AI detected a verification wall (CAPTCHA/Cloudflare/Login). Pausing for you!")
+                    input("👉 Handle the wall manually in the open browser window, then press ENTER here to let the script resume...")
+                    navigation_success = True
+                else:
+                    print("🛑 AI determined this page is a dead end. Skipping link.")
+                    browser.close()
+                    return "skipped", f"AI Navigation Skip: {error_str}"
 
         # ── Step 1: Route through Arbetsförmedlingen / nested ATS ────────────
-        # FIX: was passing undefined `url` — now correctly passes `job_url`.
-        # FIX: unpack tuple — handle_arbetsformedlingen returns (page, status_override).
         page, status_override = handle_arbetsformedlingen(page, context, job_url)
         if status_override == "expired":
             browser.close()
             return "expired", "Ansökningstiden har gått ut"
 
-        # ── Step 2: Email check — runs on the REAL company page now ──────────
-        # FIX: moved AFTER routing so AF sidebar contact emails don't trigger
-        # false positives before we even reach the actual application page.
+        # ── Step 2: Email check ──────────────────────────────────────────────
         job_title = job_url.split('/')[-1] or "Fullstack Developer"
         email_status = handle_email_application(page, job_title=job_title)
         if email_status:
@@ -346,4 +394,4 @@ def apply_to_job(job_url):                          # ← parameter is job_url t
 
 if __name__ == "__main__":
     print("Executing standalone single-job test...")
-    apply_to_job("https://arbetsformedlingen.se/platsbanken/annonser/31073897")
+    apply_to_job("https://arbetsformedlingen.se/platsbanken/annonser/31153829")
