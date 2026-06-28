@@ -1,1 +1,14 @@
 /.env.backup
+# Env files
+.env
+*.env
+
+# PDFs (ignore all of them)
+*.pdf
+
+# Your other existing ignores...
+/shelf/
+/workspace.xml
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
